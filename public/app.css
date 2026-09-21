@@ -195,11 +195,12 @@ img, svg { max-width: 100%; }
 .callout p:last-child { margin-bottom: 0; }
 
 /* Diagrams */
-.diagram { margin: 6px 0 18px; background: var(--bg2); border: 1px solid var(--line); border-radius: 4px; padding: 10px; overflow-x: auto; }
-.diagram svg { display: block; width: 100%; min-width: 560px; height: auto; font-family: var(--font); }
+.diagram { margin: 6px 0 18px; background: var(--bg2); border: 1px solid var(--line); border-radius: 4px; padding: 10px; overflow: hidden; }
+.diagram svg { display: block; width: 100%; height: auto; font-family: var(--font); }
 .diagram figcaption { font-size: 12px; color: var(--fg3); margin-top: 6px; text-align: center; }
-.diagram::after { content: '← прокрути схему →'; display: block; font-size: 11px; color: var(--fg3); text-align: center; margin-top: 4px; }
-@media (min-width: 600px) { .diagram::after { display: none; } .diagram svg { min-width: 0; } }
+.diagram .d-wide { display: none; }
+.diagram .d-narrow { display: block; max-width: 420px; margin: 0 auto; }
+@media (min-width: 600px) { .diagram .d-wide { display: block; } .diagram .d-narrow { display: none; } }
 .diagram .box { fill: var(--bg); stroke: var(--line); stroke-width: 1.2; }
 .diagram .box.a { fill: var(--brand-soft); stroke: var(--brand); }
 .diagram .box.ok { fill: var(--ok-soft); stroke: var(--ok-bright); }

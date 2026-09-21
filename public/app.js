@@ -217,6 +217,33 @@ function taskHtml(t) {
     </div></div>`;
 }
 
+// Step flow shown at the bottom of every pane: where you are in the lesson and what to do next.
+function lessonSteps(l, current) {
+  const tasks = l.tasks || []; const quiz = l.quiz || [];
+  const tDone = tasks.filter((t) => state.progress.tasks[t.id]?.done).length;
+  const qDone = quiz.filter((_, qi) => state.progress.quizzes[`${l.id}-q${qi}`]).length;
+  const steps = [{ id: 'overview', label: 'Огляд', done: true, hint: 'теорія' }];
+  if (tasks.length) steps.push({ id: 'tasks', label: 'Завдання', done: tDone === tasks.length, hint: `${tDone}/${tasks.length}` });
+  if (quiz.length) steps.push({ id: 'quiz', label: 'Тест', done: qDone === quiz.length, hint: `${qDone}/${quiz.length}` });
+  const ci = steps.findIndex((x) => x.id === current);
+  const nextStep = steps.slice(ci + 1).find((x) => !x.done) || steps.find((x) => !x.done && x.id !== current) || (current === 'sources' ? steps[1] : null);
+  const allDone = steps.every((x) => x.done);
+  const left = [];
+  if (tasks.length && tDone < tasks.length) left.push(`${tasks.length - tDone} завдан${tasks.length - tDone === 1 ? 'ня' : 'ня'}`);
+  if (quiz.length && qDone < quiz.length) left.push(`${quiz.length - qDone} питан${quiz.length - qDone === 1 ? 'ня' : 'ь'}`);
+  const isDoneL = isDone(l.id);
+  let cta;
+  if (nextStep) cta = `<button class="btn primary block" data-action="goto-tab" data-tab="${nextStep.id}">${steps.indexOf(nextStep) < ci ? 'Повернутися до ' : ''}${nextStep.id === 'tasks' ? (steps.indexOf(nextStep) < ci ? 'завдань' : 'Перейти до завдань') : (steps.indexOf(nextStep) < ci ? 'тесту' : 'Пройти тест')} →</button>`;
+  else if (isDoneL) cta = `<button class="btn ok block" data-action="lesson-done" data-id="${l.id}">✓ Лекцію завершено — далі →</button>`;
+  else cta = `<button class="btn ${allDone ? 'primary' : ''} block" data-action="lesson-done" data-id="${l.id}">Завершити лекцію і продовжити →</button>`;
+  return `<div class="lesson-steps" data-steps>
+    <div class="ls-head">${current === 'sources' ? 'Кроки лекції' : allDone ? 'Усі кроки виконано' : left.length ? `Залишилось: ${left.join(' і ')}` : 'Далі в цій лекції'}</div>
+    <ol class="ls-list">${steps.map((x, k) => `<li class="${x.done && x.id !== 'overview' ? 'done' : ''} ${x.id === current ? 'cur' : ''}"><button data-action="goto-tab" data-tab="${x.id}"><span class="num">${x.done && x.id !== 'overview' ? '✓' : k + 1}</span><span class="lbl">${x.label}</span><span class="hint">${x.hint}</span></button></li>`).join('')}</ol>
+    ${cta}
+    ${nextStep && current !== 'overview' && current !== 'sources' && !isDoneL ? `<button class="btn ghost block sm" data-action="lesson-done" data-id="${l.id}">або завершити лекцію зараз і продовжити →</button>` : ''}
+  </div>`;
+}
+
 function viewLesson(lid) {
   const l = lessonById[lid]; if (!l) return viewNotFound();
   const m = l.module; const i = m.lessons.findIndex((x) => x.id === l.id); const mi = COURSE.modules.indexOf(m);
@@ -242,16 +269,15 @@ function viewLesson(lid) {
       ${quiz.length ? `<button data-tab="quiz" class="${tab === 'quiz' ? 'active' : ''}">Тест<span class="n">${qDone}/${quiz.length}</span></button>` : ''}
       ${sources.length ? `<button data-tab="sources" class="${tab === 'sources' ? 'active' : ''}">Ресурси<span class="n">${sources.length}</span></button>` : ''}
     </div>
-    <div class="pane ${tab === 'overview' ? 'active' : ''}" data-pane="overview"><div class="md">${renderMd(l.md)}</div>
-      ${tasks.length ? `<div class="callout idea"><b>Далі</b><p>Виконай ${tasks.length} завдан${tasks.length === 1 ? 'ня' : 'ня'} у вкладці «Завдання» і пройди тест, потім познач лекцію завершеною.</p></div>` : ''}</div>
-    <div class="pane ${tab === 'tasks' ? 'active' : ''}" data-pane="tasks">${tasks.map(taskHtml).join('') || '<div class="empty">Немає завдань</div>'}</div>
-    <div class="pane ${tab === 'quiz' ? 'active' : ''}" data-pane="quiz">${quiz.map((_, qi) => quizHtml(l, qi)).join('') || '<div class="empty">Немає тесту</div>'}</div>
-    <div class="pane ${tab === 'sources' ? 'active' : ''}" data-pane="sources"><ul class="sources">${sources.map((s) => `<li><a href="${esc(s.u)}" target="_blank" rel="noopener">${esc(s.t)}</a>${s.d ? `<small>${esc(s.d)}</small>` : ''}</li>`).join('')}</ul></div>
-    <div class="complete-box"><button class="btn block ${done ? 'ok' : 'primary'}" data-action="lesson-done" data-id="${l.id}">${done ? '✓ Лекцію завершено (натисни, щоб скасувати)' : 'Завершити лекцію і продовжити'}</button></div>
+    <div class="pane ${tab === 'overview' ? 'active' : ''}" data-pane="overview"><div class="md">${renderMd(l.md)}</div>${lessonSteps(l, 'overview')}</div>
+    <div class="pane ${tab === 'tasks' ? 'active' : ''}" data-pane="tasks">${tasks.map(taskHtml).join('') || '<div class="empty">Немає завдань</div>'}${lessonSteps(l, 'tasks')}</div>
+    <div class="pane ${tab === 'quiz' ? 'active' : ''}" data-pane="quiz">${quiz.map((_, qi) => quizHtml(l, qi)).join('') || '<div class="empty">Немає тесту</div>'}${lessonSteps(l, 'quiz')}</div>
+    <div class="pane ${tab === 'sources' ? 'active' : ''}" data-pane="sources"><ul class="sources">${sources.map((s) => `<li><a href="${esc(s.u)}" target="_blank" rel="noopener">${esc(s.t)}</a>${s.d ? `<small>${esc(s.d)}</small>` : ''}</li>`).join('')}</ul>${lessonSteps(l, 'sources')}</div>
     <div class="lesson-nav">
-      ${prev ? `<a class="btn" href="#/lesson/${prev.id}">‹ Попередня</a>` : '<span></span>'}
-      ${next ? `<a class="btn" href="#/lesson/${next.id}">Наступна ›</a>` : `<a class="btn" href="#/">До курсу</a>`}
+      ${prev ? `<a class="btn ghost" href="#/lesson/${prev.id}">‹ Попередня лекція</a>` : '<span></span>'}
+      ${next ? `<a class="btn ghost" href="#/lesson/${next.id}">Наступна лекція ›</a>` : `<a class="btn ghost" href="#/">До курсу</a>`}
     </div>
+    ${done ? `<div class="muted" style="text-align:center;margin-bottom:8px">Лекцію завершено · <button class="linkbtn" data-action="lesson-done" data-id="${l.id}">скасувати позначку</button></div>` : ''}
   </article>
   <aside class="lesson-side"><div class="sh">Зміст курсу</div>${curriculum(m.id, l.id)}</aside>
   </div>`;
@@ -335,6 +361,10 @@ function render(keepScroll = false) {
   lastRoute = r;
 }
 function renderSyncDot() { const d = $('#syncdot'); if (d) d.className = `syncdot ${state.online ? 'on' : 'off'}`; }
+function refreshSteps(l) {
+  if (!l) return;
+  document.querySelectorAll('.pane').forEach((p) => { const el = $('[data-steps]', p); if (el) el.outerHTML = lessonSteps(l, p.dataset.pane); });
+}
 function switchTab(name) {
   state.tab = name;
   document.querySelectorAll('.tabs button').forEach((b) => b.classList.toggle('active', b.dataset.tab === name));
@@ -348,6 +378,11 @@ app.addEventListener('click', async (e) => {
   const act = btn.dataset.action; const id = btn.dataset.id;
   try {
     if (act === 'theme') toggleTheme();
+    if (act === 'goto-tab') {
+      switchTab(btn.dataset.tab);
+      const tabs = $('.tabs'); if (tabs) { const top = tabs.getBoundingClientRect().top + window.scrollY - 64; window.scrollTo({ top, behavior: 'smooth' }); }
+      return;
+    }
     if (act === 'lesson-done') {
       const was = isDone(id);
       const patch = { lessons: { [id]: was ? null : { done: true, ts: Date.now() } } };
@@ -365,6 +400,7 @@ app.addEventListener('click', async (e) => {
       const lesson = lessonById[location.hash.split('/')[2]]; const n = $('.tabs button[data-tab="tasks"] .n');
       if (n && lesson?.tasks) n.textContent = `${lesson.tasks.filter((t) => state.progress.tasks[t.id]?.done).length}/${lesson.tasks.length}`;
       toast(act === 'task-done' ? (done ? 'Завдання виконано ✓' : 'Позначку знято') : 'Нотатки збережено');
+      refreshSteps(lesson);
     }
     if (act === 'quiz') {
       const { qid, li, qi, oi } = btn.dataset; const q = lessonById[li].quiz[+qi];
@@ -372,6 +408,7 @@ app.addEventListener('click', async (e) => {
       const el = $(`[data-quiz="${qid}"]`); if (el) el.outerHTML = quizHtml(lessonById[li], +qi);
       const l = lessonById[li]; const n = $('.tabs button[data-tab="quiz"] .n');
       if (n) n.textContent = `${l.quiz.filter((_, k) => state.progress.quizzes[`${l.id}-q${k}`]).length}/${l.quiz.length}`;
+      refreshSteps(l);
     }
     if (act === 'create') {
       const custom = $('#newCode').value.trim(); btn.disabled = true;

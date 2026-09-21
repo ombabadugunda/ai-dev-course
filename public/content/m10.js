@@ -136,7 +136,7 @@ Scott Moss (DBOS + Postgres): обгортай побічні дії у чекп
 
 ## Task system і фонові задачі
 
-learn-claude-code s10–s12: граф задач на диску (\`tasks.json\` з \`blockedBy/blocks\`, статуси), фонові задачі (процес, що пише статус у файл), cron. Claude Code agent teams використовують саме такий спільний task list. CC Mirror — відкрита реалізація conductor/worker з JSON-задачами.
+[learn-claude-code](https://github.com/shareAI-lab/learn-claude-code) s10–s12: граф задач на диску (\`tasks.json\` з \`blockedBy/blocks\`, статуси), фонові задачі (процес, що пише статус у файл), cron. Claude Code agent teams використовують саме такий спільний task list. CC Mirror — відкрита реалізація conductor/worker з JSON-задачами.
 
 ## Human-in-the-loop
 
@@ -220,7 +220,7 @@ TypeScript: \`import { query } from "@anthropic-ai/claude-agent-sdk"\` — то�
 - **Hooks** — ті самі події (PreToolUse, PostToolUse, Stop…) як Python/TS-callbacks — без shell-скриптів.
 - **Subagents** — \`agents={"verifier": {...}}\` програмно; \`Agent(...)\`-обмеження, хто кого спавнить.
 - **canUseTool** — callback для approval UI: показати користувачу, дочекатись, повернути allow/deny — HITL з Модуля 10.2 у 10 рядків.
-- **Sessions** — resume / fork: продовжити або розгалужити сесію; \`interrupt()\`.
+- **Sessions** — resume / fork: продовжити або розгалузити сесію; \`interrupt()\`.
 - **Structured outputs**, стрімінг у web-UI (SSE), \`max_budget_usd\`.
 - Завантаження CLAUDE.md, skills (\`.claude/skills\`), plugins за шляхом — щоб твій продукт ділив harness із CLI.
 
@@ -233,7 +233,7 @@ TypeScript: \`import { query } from "@anthropic-ai/claude-agent-sdk"\` — то�
 
 ## Що ти отримав безкоштовно порівняно з Модулем 10.1
 
-Компакцію, session log, permissions-модель, tool-набір із обрізанням/пагінацією, hooks, субагентів, skills, MCP-клієнт, вивід stream-json. Ціна — залежність від рушія і його дефолтів; тому Vizuara/learn-claude-code радять спершу зібрати свій цикл, щоб розуміти, що саме SDK робить за тебе.
+Компакцію, session log, permissions-модель, tool-набір із обрізанням/пагінацією, hooks, субагентів, skills, MCP-клієнт, вивід stream-json. Ціна — залежність від рушія і його дефолтів; тому [Vizuara](https://vizuara.ai/) і [learn-claude-code](https://github.com/shareAI-lab/learn-claude-code) радять спершу зібрати свій цикл, щоб розуміти, що саме SDK робить за тебе.
 
 ## Managed Agents
 

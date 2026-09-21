@@ -247,9 +247,25 @@ img, svg { max-width: 100%; }
 .sources li a { text-decoration: underline; }
 .sources li small { display: block; color: var(--fg3); font-size: 12px; }
 
-.lesson-nav { display: flex; gap: 8px; margin: 22px 0 10px; }
-.lesson-nav a { flex: 1; text-align: center; }
-.complete-box { margin-top: 22px; }
+.lesson-nav { display: flex; gap: 8px; margin: 14px 0 10px; }
+.lesson-nav a { flex: 1; text-align: center; font-size: 14px; }
+.linkbtn { background: none; border: 0; padding: 0; color: var(--brand-ink); text-decoration: underline; cursor: pointer; font: inherit; font-size: 13px; }
+
+/* Lesson step flow (bottom of each pane) */
+.lesson-steps { margin: 26px 0 8px; border: 1px solid var(--line); border-radius: 4px; background: var(--bg2); padding: 14px; }
+.lesson-steps .ls-head { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: var(--fg3); margin-bottom: 10px; }
+.ls-list { list-style: none; margin: 0 0 12px; padding: 0; display: flex; gap: 6px; }
+.ls-list li { flex: 1; min-width: 0; }
+.ls-list button { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 4px; border: 1px solid var(--line); border-radius: 4px; background: var(--bg); color: var(--fg3); cursor: pointer; font: inherit; }
+.ls-list .num { width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--line); display: grid; place-items: center; font-size: 12px; font-weight: 800; }
+.ls-list .lbl { font-size: 13px; font-weight: 800; }
+.ls-list .hint { font-size: 11px; }
+.ls-list li.cur button { border-color: var(--brand); color: var(--fg); background: var(--brand-soft); }
+.ls-list li.cur .num { background: var(--brand); border-color: var(--brand); color: #fff; }
+.ls-list li.done button { color: var(--ok); }
+.ls-list li.done .num { background: var(--ok-bright); border-color: var(--ok-bright); color: #fff; }
+.ls-list li.done.cur button { border-color: var(--ok-bright); background: var(--ok-soft); }
+@media (min-width: 720px) { .ls-list button { flex-direction: row; justify-content: center; gap: 8px; padding: 10px 8px; } .ls-list .hint { color: var(--fg3); } }
 
 /* Progress page */
 .pgrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin: 12px 0 18px; }

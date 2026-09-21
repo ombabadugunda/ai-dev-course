@@ -220,7 +220,7 @@ TypeScript: \`import { query } from "@anthropic-ai/claude-agent-sdk"\` — то�
 - **Hooks** — ті самі події (PreToolUse, PostToolUse, Stop…) як Python/TS-callbacks — без shell-скриптів.
 - **Subagents** — \`agents={"verifier": {...}}\` програмно; \`Agent(...)\`-обмеження, хто кого спавнить.
 - **canUseTool** — callback для approval UI: показати користувачу, дочекатись, повернути allow/deny — HITL з Модуля 10.2 у 10 рядків.
-- **Sessions** — resume / fork: продовжити або розгалузити сесію; \`interrupt()\`.
+- **Sessions** — resume / fork: продовжити або розгалужити сесію; \`interrupt()\`.
 - **Structured outputs**, стрімінг у web-UI (SSE), \`max_budget_usd\`.
 - Завантаження CLAUDE.md, skills (\`.claude/skills\`), plugins за шляхом — щоб твій продукт ділив harness із CLI.
 

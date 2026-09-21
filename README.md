@@ -18,3 +18,4 @@ npm start          # http://localhost:3000
 1. New Project → Deploy from GitHub repo.
 2. Додати Volume, mount path `/data`; змінна `DATA_DIR=/data`.
 3. Generate Domain.
+Deployed: https://ai-dev-course-production.up.railway.app

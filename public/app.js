@@ -89,15 +89,15 @@ const nextLesson = () => allLessons.find((l) => !isDone(l.id));
 /* ---------- markdown ---------- */
 marked.setOptions({ gfm: true, breaks: false });
 function renderMd(md) {
-  let html = marked.parse(md || '');
+  // callouts: :::tip Title\n...\n:::  (pre-processed before markdown so any marked version works)
+  const labels = { tip: 'Порада', warn: 'Увага', idea: 'Ідея', note: 'Нотатка' };
+  const pre = String(md || '').replace(/^:::(tip|warn|idea|note)[ \t]*([^\n]*)\n([\s\S]*?)\n:::[ \t]*$/gm, (_, kind, title, body) =>
+    `<div class="callout ${kind}"><b>${esc(title.trim() || labels[kind])}</b>${marked.parse(body)}</div>\n`);
+  let html = marked.parse(pre);
   html = html.replace(/(?:<p>)?\[\[diagram:([\w-]+)(?:\|([^\]]*))?\]\](?:<\/p>)?/g, (_, id, cap) => {
     const svg = DIAGRAMS[id];
     if (!svg) return `<div class="callout warn"><b>Схема</b><p>Схему «${esc(id)}» не знайдено.</p></div>`;
     return `<figure class="diagram">${svg}${cap ? `<figcaption>${esc(cap)}</figcaption>` : ''}</figure>`;
-  });
-  html = html.replace(/<p>:::(tip|warn|idea|note)\s*([^<]*)<\/p>([\s\S]*?)<p>:::<\/p>/g, (_, kind, title, body) => {
-    const labels = { tip: 'Порада', warn: 'Увага', idea: 'Ідея', note: 'Нотатка' };
-    return `<div class="callout ${kind}"><b>${esc(title || labels[kind])}</b>${body}</div>`;
   });
   return html;
 }
